@@ -167,7 +167,7 @@ def main():
     import os
 
     if len(sys.argv) < 2:
-        print("Use: katlaz <comando>")
+        print("Use: katlaz <command>")
         return
 
     command = sys.argv[1]
