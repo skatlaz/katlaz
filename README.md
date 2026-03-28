@@ -1,3 +1,5 @@
+![KATLAZ ++][./assets/katlaz.png]
+
 # Katlaz++
 
 A lightweight C++ desktop app framework powered by GTK and WebKit, with a built-in CLI inspired by Node.js workflows.
