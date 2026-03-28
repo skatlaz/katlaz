@@ -14,14 +14,11 @@ def create_project(str name):
         "config"
     ]
 
-    # cria diretório base
     os.makedirs(base, exist_ok=True)
 
-    # cria subpastas
     for d in dirs:
         os.makedirs(os.path.join(base, d), exist_ok=True)
 
-    # README
     readme = f"# {name}\n\nProject create with Katlaz++\n"
     with open(os.path.join(base, "README.md"), "w") as f:
         f.write(readme)
@@ -84,33 +81,61 @@ run:
 
     print(f"Project '{{name}}' created success!")
 
-
-def main():
-    import sys
+def release(str name):
     import os
+    import subprocess
+    import shutil
 
-    if len(sys.argv) < 2:
-        print("Use: katlaz <comando>")
+    base = os.getcwd()
+    dist = os.path.join(base, "dist")
+
+    print("🔨 Compiling project...")
+
+    # compilar via MSYS2
+    subprocess.run([
+        "C:\\msys64\\usr\\bin\\bash.exe",
+        "-lc",
+        f"cd $(cygpath '{base}') && g++ app/AppMain.cpp -o {name}.exe `pkg-config --cflags --libs gtk+-3.0 webkit2gtk-4.0`"
+    ])
+
+    if not os.path.exists(f"{name}.exe"):
+        print("❌ Fail compiling")
         return
 
-    command = sys.argv[1]
+    print("📦 Creating path dist...")
+    os.makedirs(dist, exist_ok=True)
 
-    if command == "create":
-        create_project(sys.argv[2])
+    shutil.copy(f"{name}.exe", dist)
 
-    elif command == "build":
-        if len(sys.argv) > 2 and sys.argv[2] == "--release":
-            name = os.path.basename(os.getcwd())
-            build_release(name)
-        else:
-            print("Use: katlaz build --release")
+    print("🔍 Collecting DLLs...")
 
-    elif command == "serve":
-        serve()
+    result = subprocess.run([
+        "C:\\msys64\\usr\\bin\\bash.exe",
+        "-lc",
+        f"cd $(cygpath '{base}') && ldd {name}.exe"
+    ], capture_output=True, text=True)
 
-    else:
-        print("Command Unknow!")
-        
+    lines = result.stdout.splitlines()
+
+    dlls = []
+    for line in lines:
+        if "mingw64" in line:
+            parts = line.split("=>")
+            if len(parts) > 1:
+                path = parts[1].strip().split(" ")[0]
+                dlls.append(path)
+
+    for dll in dlls:
+        try:
+            shutil.copy(dll, dist)
+        except:
+            pass
+
+    shutil.copytree("app", os.path.join(dist, "app"), dirs_exist_ok=True)
+
+    print("✅ Build release success!")
+    print(f"📁 Path: {dist}")
+
 def serve():
     import http.server
     import socketserver
@@ -136,3 +161,29 @@ def serve():
         print("📁 Server path /app")
         print("⛔ CTRL+C to stop")
         httpd.serve_forever()
+
+def main():
+    import sys
+    import os
+
+    if len(sys.argv) < 2:
+        print("Use: katlaz <comando>")
+        return
+
+    command = sys.argv[1]
+
+    if command == "create":
+        create_project(sys.argv[2])
+
+    elif command == "build":
+        if len(sys.argv) > 2 and sys.argv[2] == "--release":
+            name = os.path.basename(os.getcwd())
+            release(name)
+        else:
+            print("Use: katlaz build --release")
+
+    elif command == "serve":
+        serve()
+
+    else:
+        print("Command Unknow!")
