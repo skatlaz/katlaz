@@ -1,4 +1,4 @@
-![KATLAZ ++][./assets/katlaz.png]
+![KATLAZ ++](./assets/katlaz.png)
 
 # Katlaz++
 
