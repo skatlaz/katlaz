@@ -1,3 +1,5 @@
+![KATLAZCC-COMPILER](../assets/katlaz.png)
+
 # 🚀 Katlaz Language
 
 **Katlaz** is a compiled programming language that combines Python-like simplicity with C-level performance.
