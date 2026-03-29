@@ -11,6 +11,14 @@ program: statement+
           | for_stmt
           | assign_stmt
           | expr
+          | sqlite_open
+          | sqlite_exec
+          | sqlite_query
+          | ...
+
+sqlite_open: NAME "=" "sqlite_open" "(" STRING ")"
+sqlite_exec: "sqlite_exec" "(" NAME "," STRING ")"
+sqlite_query: "sqlite_query" "(" NAME "," STRING ")"
 
 if_stmt: "if" expr ":" block ("else" ":" block)?
 
@@ -49,12 +57,21 @@ block: statement+
        | NAME          -> var
        | func_call
        | "(" expr ")"
+       | "[" args_call? "]" -> array
+       | NAME "[" expr "]"  -> array_access
+       | ...
 
 func_call: NAME "(" args_call? ")"
 
 args_call: expr ("," expr)*
 
 type: "int" | "float" | "str"
+    | "int" "[]"   -> int_array
+    | "float" "[]" -> float_array
+    | "str" "[]"   -> str_array
+    | "int"
+    | "float"
+    | "str"
 
 %import common.CNAME -> NAME
 %import common.NUMBER

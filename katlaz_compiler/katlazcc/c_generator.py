@@ -1,8 +1,19 @@
 #c_generator.py
+#include <Python.h>
 
-# codegen/c_generator.py
+def generate(self, ast):
+    self.emit("#include <Python.h>")
+    self.emit("#include <stdio.h>")
+    self.emit("")
+
+    self.emit("int main() {")
+    self.indent += 1
+
+    self.emit("Py_Initialize();")
+    self.emit("")
 
 class CGenerator:
+    
     def __init__(self):
         self.code = []
         self.indent = 0
@@ -80,4 +91,36 @@ class CGenerator:
         elif isinstance(node, Var):
             return node.name
 
+    def visit_Array(self, node):
+        values = ", ".join(self.expr(e) for e in node.elements)
+        return f"{{{values}}}"
 
+
+    def expr(self, node):
+        if isinstance(node, ArrayAccess):
+            return f"{node.name}[{self.expr(node.index)}]"
+        if isinstance(node, SqliteQuery):
+            return self.generate_sqlite_query(node)
+        elif isinstance(node, ArrayAccess):
+            return f"PyList_GetItem({node.name}, {index})"
+
+    def visit_PyList(self, node):
+        self.emit("PyObject* lista = PyList_New(0);")
+
+    def visit_PyImport(self, node):
+        self.emit(f'PyImport_ImportModule("{node.module}");')
+
+def generate_sqlite_query(self, node):
+    var_name = f"query_result_{id(node)}"
+
+    self.emit(f'PyObject *{var_name}_cursor = PyObject_CallMethod({node.db_var}, "execute", "s", "{node.query}");')
+    self.emit(f'PyObject *{var_name} = PyObject_CallMethod({var_name}_cursor, "fetchall", NULL);')
+
+    return var_name
+
+
+
+self.emit("Py_Finalize();")
+self.emit("return 0;")
+self.indent -= 1
+self.emit("}")

@@ -71,6 +71,17 @@ class KatlazTransformer(Transformer):
     def type(self, token):
         return str(token[0])
 
+    def sqlite_open(self, items):
+        return SqliteOpen(items[1])
+
+    def sqlite_exec(self, items):
+        return SqliteExec(items[0], items[1])
+
+    def sqlite_query(self, items):
+        return SqliteQuery(items[0], items[1])
+
+    def is_python_object(self, node):
+        return isinstance(node, SqliteQuery)
 
 def parse(code):
     tree = parser.parse(code)
