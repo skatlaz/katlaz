@@ -19,7 +19,7 @@ It transpiles `.katlaz` source code into C and compiles it into native executabl
 ## 📦 Installation
 
 ```bash
-pip install katlaz
+#[under development]pip install katlaz
 ```
 
 ---
