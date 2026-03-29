@@ -116,6 +116,37 @@ print(123)
 
 ---
 
+### 📦 Arrays
+
+```katlaz
+x:int[] = [1,2,3]
+```
+
+### 🧩 Listas dinâmicas
+
+```katlaz
+lista = py_list()
+lista.append(1)
+```
+### 💾 SQLite
+
+```katlaz
+db = sqlite_open("test.db")
+sqlite_exec(db, "CREATE TABLE users(id INT)")
+sqlite_exec(db, "SELECT * FROM users")
+sqlite_exec(db, "INSERT INTO users VALUES (1)")
+sqlite_exec(db, "INSERT INTO users VALUES (2)")
+rows = sqlite_query(db, "SELECT id FROM users")
+print(rows)
+```
+
+### 🐍 PyPI libs
+
+```katlaz
+py_import("requests")
+```
+
+
 ## 🏗️ Compilation Pipeline
 
 ```text
@@ -211,4 +242,3 @@ Katlaz is inspired by:
 ## ⭐ Support
 
 If you like this project, consider giving it a star ⭐ on GitHub!
-
