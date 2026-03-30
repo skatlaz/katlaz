@@ -1,2 +1,0 @@
-route hello:
-    print "🔥 Funcionou direto na UI!"

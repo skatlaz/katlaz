@@ -1,7 +1,0 @@
-# FILE: pcl/mac.pcl
-
-system mouse.position:
-    native mac_api
-
-system file.read(path):
-    open path
