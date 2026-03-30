@@ -76,7 +76,7 @@ katlaz serve
 
 ---
 
-# ⚙️ 6. Compiler Separation (IMPORTANT)
+# ⚙️ 5. Compiler Separation (IMPORTANT)
 
 The repository contains a **compiler subsystem** located at:
 
@@ -97,70 +97,27 @@ This includes:
 # 📁 Recommended Structure for Compiler Packaging
 
 ```bash
-katlaz/
-│
-├── katlaz/                # CLI + runtime
-│
-├── katlaz_compiler/       # NEW package (recommended)
-│   ├── __init__.py
-│   ├── parser.py
-│   ├── transpiler.py
-│   ├── backend/
-│   └── core/
-│
-├── pyproject.toml
+#pip install katlaz
+#pip install katlazapp
+#on development and awaiting for official release
 ```
 
 ---
 
-# 🧱 7. Create `pyproject.toml` (Root)
-
-```toml
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "katlaz"
-version = "0.1.0"
-description = "Katlaz Framework"
-authors = [{name="Katlaz"}]
-dependencies = []
-```
-
 ---
 
-# ⚙️ 8. Separate Compiler Package
-
-## 📄 `katlaz_compiler/pyproject.toml`
-
-```toml
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "katlaz-compiler"
-version = "0.1.0"
-description = "Katlaz Language Compiler"
-authors = [{name="Katlaz"}]
-dependencies = []
-```
-
----
-
-# 🏗️ 9. Build Compiler Only
+# 🏗️ 6. Build Compiler Only
 
 Navigate to compiler package:
 
 ```bash
-cd katlaz_compiler
+cd katlazapp
 python -m build
 ```
 
 ---
 
-# 📦 10. Install Compiler Separately
+# 📦 7. Install Compiler Separately
 
 ```bash
 pip install .
@@ -169,25 +126,25 @@ pip install .
 Now you can import it independently:
 
 ```python
-import katlaz_compiler
+import katlaz
 ```
 
 ---
 
-# 🔗 11. Linking CLI with Compiler
+# 🔗 8. Linking CLI with Compiler
 
 Inside your CLI (`katlaz.pyx` or `katlaz.py`):
 
 ```python
-from katlaz_compiler.parser import parse_katlaz
-from katlaz_compiler.transpiler import transpile
+from katlaz.parser import parse_katlaz
+from katlaz.transpiler import transpile
 ```
 
 👉 This keeps architecture clean and modular.
 
 ---
 
-# 🧪 12. Optional: Editable Mode (Dev)
+# 🧪 9. Optional: Editable Mode (Dev)
 
 For development:
 
@@ -198,34 +155,34 @@ pip install -e .
 And for compiler:
 
 ```bash
-cd katlaz_compiler
+cd katlaz
 pip install -e .
 ```
 
 ---
 
-# 🧠 13. Advanced: Multiple Packages in One Repo
+# 🧠 10. Advanced: Multiple Packages in One Repo
 
 You can manage both packages:
 
 ```bash
 pip install ./katlaz
-pip install ./katlaz_compiler
+pip install ./katlazapp
 ```
 
 ---
 
-# 🔥 14. Recommended Workflow
+# 🔥 11. Recommended Workflow
 
 ```bash
 git clone https://github.com/skatlaz/katlaz.git
 
 # install compiler first
-cd katlaz_compiler
+cd katlaz
 pip install -e .
 
 # install main framework
-cd ..
+cd katlazapp
 pip install -e .
 ```
 
