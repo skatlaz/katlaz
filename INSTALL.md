@@ -69,20 +69,13 @@ pip install dist/*.whl
 After installation:
 
 ```bash
-katlaz create my_app
-katlaz build
-katlaz serve
+katlazapp create my_app
+katlazapp build
+katlazapp serve
 ```
 
 ---
 
-# ⚙️ 5. Compiler Separation (IMPORTANT)
-
-The repository contains a **compiler subsystem** located at:
-
-```bash
-katlaz/katlaz/
-```
 
 This includes:
 
