@@ -1,323 +1,418 @@
-# 🚀 Katlaz Framework
+# 🚀 KatlazApp 2.0 — Complete Framework Manual
 
-> ⚡ Experimental framework for building **web + desktop applications**
-> 🧠 Custom language (`.katlaz`)
-> 🔗 Simple JavaScript ↔ Python bridge
-> 🖥️ Native runtime (GTK + WebKit)
+KatlazApp 2.0 is a **full-stack framework with its own DSL**, designed to unify backend, frontend, and desktop development into a single workflow.
 
----
+It combines:
 
-# 📌 Overview
-
-Katlaz is an all-in-one system that combines:
-
-* 🧠 A custom scripting language (`.katlaz`)
-* ⚙️ A compiler (Katlaz → Python)
-* 🔗 A bridge between UI (HTML/JS) and backend (Python)
-* 🖥️ A lightweight desktop runtime
-* 🧩 A system abstraction layer (`.pcl`)
+* ⚡ Custom DSL (`.katlaz`)
+* 🧠 Python runtime engine
+* 🌐 HTTP + WebSocket (real-time)
+* 🖥️ Desktop support (WebView bridge)
+* 🗄️ SQLite ORM
+* 📁 File system API
 
 ---
 
-# 📦 Project Structure
+# 📦 Installation
 
 ```bash
-katlaz/
-│
-├── katlaz.pyx
-│
-├── runtime/
-│   ├── core.py
-│   ├── bridge.py
-│   ├── loader.py
-│
-├── compiler/
-│   ├── parser.py
-│   ├── transpiler.py
-│
-├── pcl/
-│   ├── windows.pcl
-│   ├── linux.pcl
-│   ├── mac.pcl
-│   ├── android.pcl
-│   ├── ios.pcl
-│
-├── app/
-│   ├── app.html
-│   ├── katlaz.js
-│   ├── AppMain.cpp
-│
-└── Makefile / build scripts
+pip install katlazapp
+```
+
+Create and run a project:
+
+```bash
+katlazapp create myapp
+cd myapp
+katlazapp build
+katlazapp serve
 ```
 
 ---
 
-# ⚡ Installation
+# 🧠 Architecture
 
-### Requirements
-
-* Python 3.10+
-* GCC / G++
-* GTK3 + WebKit2GTK (Linux/macOS)
-* MSYS2 (Windows)
-
----
-
-# 🚀 Usage
-
-## Create a project
-
-```bash
-katlaz create my_app
-cd my_app
+```text
+.katlaz → Parser → AST → Transpiler → Python → Runtime → Frontend
 ```
 
 ---
 
-## Create a `.katlaz` file
+# 📁 Project Structure
+
+```text
+myapp/
+ ├── main.katlaz
+ ├── main.py          # generated
+ └── app/
+     ├── app.html
+     ├── katlaz.js
+     └── assets...
+```
+
+---
+
+# 🛣️ KATLAZ DSL — FULL COMMAND REFERENCE
+
+## 🔹 Routes
+
+Define backend endpoints:
 
 ```katlaz
 route hello:
-    print "Hello from Katlaz"
+    emit "notify", "Hello World"
 ```
 
----
-
-## Build
-
-```bash
-katlaz build
-```
-
----
-
-## Run
-
-```bash
-katlaz serve
-```
-
-or desktop:
-
-```bash
-make run
-```
-
----
-
-# 🧠 Katlaz Language
-
-Basic syntax:
+With parameters:
 
 ```katlaz
-route hello:
-    print "Hello world"
+route greet(name: string):
+    emit "notify", name
 ```
 
-### Concepts
+---
 
-| Keyword | Description                 |
-| ------- | --------------------------- |
-| `route` | Defines a callable function |
-| `print` | Outputs text in backend     |
+## 🔹 Variables & Expressions
+
+```katlaz
+route calc:
+    x = 10
+    y = x + 5
+    emit "result", y
+```
 
 ---
 
-# 🔗 Simple Bridge (HTML ↔ Katlaz)
+## 🔹 Emit (Frontend Events)
 
-This is the core feature of Katlaz: connecting UI directly to backend logic.
+```katlaz
+emit "notify", "Message"
+emit "result", 123
+```
 
 ---
 
-## 📌 HTML → Katlaz
+## 🔹 Return Values
 
-### HTML
+```katlaz
+route raw:
+    return 123
+```
+
+---
+
+## 🔹 Type System
+
+Supported types:
+
+* `string`
+* `int`
+* `float`
+* `bool`
+* `any`
+
+Example:
+
+```katlaz
+route sum(a: int, b: int):
+    emit "result", a + b
+```
+
+---
+
+## 🔹 Database (SQLite ORM)
+
+### Define Model
+
+```katlaz
+model users:
+    id int
+    name string
+```
+
+### Insert
+
+```katlaz
+db.insert "users", {name: name}
+```
+
+### Select
+
+```katlaz
+users = db.select "users"
+```
+
+---
+
+## 🔹 File System
+
+### Write
+
+```katlaz
+fs.write "file.txt", "Hello"
+```
+
+### Read
+
+```katlaz
+data = fs.read "file.txt"
+```
+
+---
+
+# 🌐 JAVASCRIPT API
+
+## Call Backend
+
+```javascript
+katlaz.call("hello")
+```
+
+```javascript
+katlaz.call("greet", { name: "John" })
+```
+
+---
+
+## Receive Events
+
+```javascript
+window.addEventListener("notify", e => {
+    console.log(e.detail)
+})
+```
+
+---
+
+## WebSocket Mode (Real-time)
+
+```javascript
+const ws = new WebSocket("ws://localhost:8765")
+
+ws.onmessage = (msg) => {
+    const res = JSON.parse(msg.data)
+    katlaz._receive(res)
+}
+
+katlaz.call = (name, data = {}) => {
+    ws.send(JSON.stringify({ name, data }))
+}
+```
+
+---
+
+# 🌐 HTML EXAMPLE
 
 ```html
-<button onclick="katlaz.call('hello')">
-    Click me
-</button>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
 
+<h1>KatlazApp</h1>
+<p id="status">Waiting...</p>
+
+<button onclick="katlaz.call('hello')">Run</button>
+
+<script src="katlaz.js"></script>
 <script>
-window.katlaz = {
-    call: function(name, data = {}) {
-        const payload = JSON.stringify({ name, data });
-        window.webkit.messageHandlers.katlaz.postMessage(payload);
-    }
-};
-</script>
-```
-
----
-
-### `.katlaz`
-
-```katlaz
-route hello:
-    print "Hello from Katlaz backend"
-```
-
-👉 When the button is clicked:
-
-* HTML calls `katlaz.call("hello")`
-* Backend executes `route hello`
-
----
-
-## 📌 Katlaz → HTML (Response Concept)
-
-Katlaz can send data back to the UI.
-
-### `.katlaz`
-
-```katlaz
-route getMessage:
-    print "Sending data back"
-```
-
----
-
-### HTML (receiving)
-
-```html
-<script>
-katlaz.call("getMessage").then(response => {
-    console.log("Response from backend:", response);
+window.addEventListener("notify", e => {
+    document.getElementById("status").innerText = e.detail;
 });
 </script>
-```
 
-👉 Flow:
-
-* Katlaz runs logic
-* Returns result
-* UI receives it (future async bridge)
-
----
-
-# ⚙️ Runtime
-
-Handles execution of compiled `.katlaz` code.
-
-### Example
-
-```python
-runtime.register("hello", func)
+</body>
+</html>
 ```
 
 ---
 
-# ⚙️ Compiler
+# ⚙️ CLI COMMANDS
 
-### Parser
-
-Converts `.katlaz` → AST
-
-### Transpiler
-
-Converts AST → Python
-
----
-
-# 🧩 System Layer (.pcl)
-
-Defines platform-specific features.
-
-### Example
-
-```pcl
-system mouse.position:
-    exec "xdotool getmouselocation"
-```
-
----
-
-# 🖥️ Desktop Runtime
-
-Built with:
-
-* GTK
-* WebKit2GTK
-* C++
-
-Runs your HTML as a native app.
-
----
-
-# 🔥 CLI Commands
+## Create Project
 
 ```bash
-katlaz create <name>
-katlaz build
-katlaz serve
+katlazapp create myapp
+```
+
+## Build (.katlaz → Python)
+
+```bash
+katlazapp build
+```
+
+## Run Server (HTTP + WS)
+
+```bash
+katlazapp serve
+```
+
+## Desktop Mode
+
+```bash
+katlazapp desktop
 ```
 
 ---
 
-# 🧱 Architecture
+# 🌐 HTTP SERVER
 
+* Runs at: `http://localhost:3000`
+* Serves static files automatically
+* Loads `app/app.html` by default
+* `/api` handles backend routes
+
+---
+
+# ⚡ WEBSOCKET SERVER
+
+* Runs at: `ws://localhost:8765`
+* Real-time communication
+* No polling
+
+---
+
+# 🔄 FULL FLOW
+
+```text
+Frontend → katlaz.call()
+          ↓
+       HTTP / WS
+          ↓
+      call_route()
+          ↓
+      Python runtime
+          ↓
+        emit()
+          ↓
+      Frontend event
 ```
-.katlaz → parser → AST → transpiler → Python → runtime → UI
+
+---
+
+# ❌ ERROR SYSTEM
+
+## Type Error
+
+```json
+{
+  "error": "Invalid type for 'name'",
+  "code": "KATLAZ_ERROR",
+  "hint": "Expected string"
+}
 ```
 
 ---
 
-# 🚀 Roadmap
+## Runtime Error
 
-* [ ] Advanced syntax
-* [ ] Reactive state system
-* [ ] Async bridge (Promises)
-* [ ] UI components
-* [ ] Mobile support
-* [ ] Native system APIs
-
----
-
-# 💡 Vision
-
-Katlaz aims to be:
-
-> ⚡ A lightweight alternative to Electron
-> 🧠 A unified frontend + backend system
-> 🔗 Simple and powerful
+```json
+{
+  "error": "division by zero",
+  "code": "RUNTIME_ERROR"
+}
+```
 
 ---
 
-# 🤝 Contributing
+## Syntax Error
 
-1. Fork the repo
-2. Create a branch
-3. Commit changes
-4. Open a Pull Request
-
----
-
-# 📜 License
-
-MIT
+```text
+[Katlaz Syntax Error] line 3: emit notify
+```
 
 ---
 
-# 🚧 Status
+# 🧠 FEATURES
 
-Experimental project under development.
-
----
-
-# 💥 Final Note
-
-Katlaz is not just a framework.
-
-It is:
-
-* a language
-* a runtime
-* a compiler
-* a platform
+* DSL-based backend
+* Automatic type validation
+* Auto-casting
+* SQLite ORM
+* File system access
+* WebSocket real-time
+* Static file server
+* SPA support
 
 ---
 
-👉 Build apps
-👉 Control the system
-👉 Own the full stack
+# 🖥️ DESKTOP MODE
 
+* Native WebView
+* No HTTP required
+* Direct JS ↔ Python communication
+
+---
+
+# 📦 BUILD EXECUTABLE
+
+```bash
+pyinstaller --onefile main.py
+```
+
+---
+
+# 🔥 DEBUGGING
+
+## Python
+
+```python
+print("DEBUG:", data)
+```
+
+## JavaScript
+
+```javascript
+console.log("Debug")
+```
+
+---
+
+# 🔐 SECURITY NOTES
+
+* Validate user input
+* Avoid exposing file paths
+* Add authentication layer (future)
+
+---
+
+# 🧩 ROADMAP
+
+* Authentication (JWT)
+* Middleware system
+* Plugin system
+* Hot reload
+* Type inference
+* IDE integration
+
+---
+
+# 🤝 CONTRIBUTING
+
+1. Fork repository
+2. Create branch
+3. Submit PR
+
+---
+
+# 📄 LICENSE
+
+MIT License
+
+---
+
+# 🚀 FINAL
+
+KatlazApp 2.0 is a **full-stack framework with its own language**, enabling you to build:
+
+* Backend APIs
+* Frontend interfaces
+* Desktop apps
+
+All in one unified system.
+
+---
+
+🔥 **Welcome to KatlazApp 2.0**
