@@ -1,20 +1,38 @@
-# FILE: runtime/core.py
+# FILE: katlazapp/runtime/core.py
 
-import json
+ROUTES = {}
 
-class KatlazRuntime:
-    def __init__(self):
-        self.routes = {}
+def register_route(name, func):
+    ROUTES[name] = func
 
-    def register(self, name, func):
-        self.routes[name] = func
 
-    def handle(self, payload):
-        data = json.loads(payload)
-        name = data.get("name")
-        args = data.get("data", {})
-
-        if name in self.routes:
-            return self.routes[name](args)
-
+def call_route(name, data=None):
+    if name not in ROUTES:
         return {"error": f"Route '{name}' not found"}
+
+    try:
+        result = ROUTES[name](data or {})
+    except Exception as e:
+        return {"error": str(e)}
+
+    return normalize(result)
+
+
+def emit(event, data=None):
+    return {
+        "event": event,
+        "data": data
+    }
+
+
+def normalize(result):
+    if result is None:
+        return {}
+
+    if isinstance(result, dict):
+        return result
+
+    if isinstance(result, str):
+        return {"event": "notify", "data": result}
+
+    return {"event": "result", "data": result}
