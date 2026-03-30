@@ -1,0 +1,7 @@
+# FILE: pcl/windows.pcl
+
+system mouse.position:
+    call ctypes.user32.GetCursorPos
+
+system file.read(path):
+    open path

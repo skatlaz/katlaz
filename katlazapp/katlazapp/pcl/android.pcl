@@ -1,0 +1,4 @@
+# FILE: pcl/android.pcl
+
+system vibrate:
+    native android_vibrator
