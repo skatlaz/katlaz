@@ -1,7 +1,0 @@
-# FILE: pcl/linux.pcl
-
-system mouse.position:
-    exec "xdotool getmouselocation"
-
-system file.read(path):
-    open path
