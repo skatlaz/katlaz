@@ -1,0 +1,71 @@
+// grammar.lark - Katlaz
+start: statement*
+
+?statement: var_decl
+          | assign
+          | func_def
+          | class_def
+          | expr
+          | for_stmt
+          | while_stmt
+          | if_stmt
+          | return_stmt
+          | pass_stmt
+
+?expr: literal
+     | NAME
+     | expr "." NAME -> attribute_access
+     | expr "(" args? ")" -> func_call
+     | expr "[" expr "]" -> array_access
+     | expr bin_op expr -> bin_op
+     | "-" expr -> neg
+
+bin_op: "+"|"-"|"*"|"/"|"=="|"!="|"<"|">"|"<="|">="
+
+literal: INT -> int_lit
+       | FLOAT -> float_lit
+       | STRING -> string_lit
+       | "True" -> true
+       | "False" -> false
+       | list_expr
+       | map_expr
+
+list_expr: "[" [expr ("," expr)*] "]"
+map_expr: "{" [map_item ("," map_item)*] "}"
+map_item: expr ":" expr
+
+var_decl: NAME ":" type "=" expr
+assign: NAME "=" expr
+
+type: NAME "<" type ">" -> generic_type
+    | NAME "[]" -> array_type
+    | NAME
+
+args: expr ("," expr)*
+
+func_def: "func" NAME ["<" NAME ">"] "(" params? ")" ["->" type] ":" block
+params: param ("," param)*
+param: NAME ":" type
+
+class_def: "class" NAME ["<" NAME ">"] ":" class_body
+class_body: class_item+
+class_item: var_decl
+          | func_def
+          | constructor
+
+constructor: "start" "(" params? ")" ":" block
+
+for_stmt: "for" NAME ":" expr ":" block
+while_stmt: "while" expr ":" block
+if_stmt: "if" expr ":" block ["else" ":" block]
+return_stmt: "return" expr
+pass_stmt: "pass"
+
+block: statement+
+NAME: /[a-zA-Z_][a-zA-Z0-9_]*/
+INT: /\d+/
+FLOAT: /\d+\.\d+/
+STRING: /"[^"]*"/
+
+%ignore /\s+/
+%ignore /#.*/

@@ -1,3 +1,5 @@
+![KATLAZ COMPILER .katlaz](assets/720ebbff-3e2b-49df-8657-d90398a07a01.png)
+
 # 🚀 Katlaz Framework
 
 > ⚡ Experimental framework for building **web + desktop applications**
