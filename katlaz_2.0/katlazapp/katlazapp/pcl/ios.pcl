@@ -1,0 +1,4 @@
+# FILE: pcl/ios.pcl
+
+system vibrate:
+    native ios_vibrator
